@@ -7,32 +7,17 @@ const { body, validationResult } = require('express-validator');
  * @param {*} res
  * @returns Object
  */
-const createProduct = [
-  body('name').notEmpty().withMessage('Nome é obrigatório'),
-  body('price').isNumeric().withMessage('O preço deve ser numérico'),
+const createProduct = async (req, res) => {
+  try {
+    const product = await Product.create(req.body)
 
-  async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-
-    // Transformação dos dados
-    const transformedData = {
-      ...req.body,
-      name: req.body.name.toLowerCase() // Convertendo o nome para minúsculo
-    };
-
-    try {
-      const product = await Product.create(transformedData);
-      return res.status(201).json(
-        product
-      );
-    } catch (error) {
-      return res.status(500).json({ error: error.message });
-    }
+    return res.status(201).json(
+      product
+    )
+  } catch (error) {
+    return res.status(500).json({ error: error.message })
   }
-];
+}
 
 
 /**
@@ -79,37 +64,22 @@ const getProductById = async (req, res) => {
  * @param {*} res
  * @returns boolean
  */
-const updateProductById = [
-  body('name').optional().notEmpty().withMessage('Nome não pode estar vazio'),
-  body('price').optional().isNumeric().withMessage('O preço deve ser numérico'),
+const updateProductById = async (req, res) => {
+  try {
+    const { id } = req.params
+    const product = await Product.update(req.body, {
+      where: { id: id }
+    })
 
-  async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+    if (product) {
+      const updatedProduct = await Product.findOne({ where: { id: id } })
+      return res.status(200).json(updatedProduct)
     }
-
-    try {
-      const { id } = req.params;
-      let product = await Product.findOne({ where: { id: id } });
-
-      if (!product) {
-        return res.status(404).send('Product not found');
-      }
-
-      // Transformação de dados antes de atualizar
-      const updatedData = req.body;
-      if (updatedData.name) {
-        updatedData.name = updatedData.name.toLowerCase(); // Converter nome para minúsculo
-      }
-
-      await product.update(updatedData);
-      return res.status(200).json( product );
-    } catch (error) {
-      return res.status(500).send(error.message);
-    }
+    throw new Error('product not found')
+  } catch (error) {
+    return res.status(500).send(error.message)
   }
-];
+}
 
 
 /**
