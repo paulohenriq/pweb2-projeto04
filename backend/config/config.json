@@ -1,9 +1,9 @@
 {
   "development": {
-    "username": "postgres",
-    "password": "postgres",
-    "database": "projeto_orm",
-    "host": "127.0.0.1",
+    "username": "postgres.ivuoqikhodkzjvxnooub",
+    "password": "pw2todolist@",
+    "database": "postgres",
+    "host": "aws-0-sa-east-1.pooler.supabase.com",
     "dialect": "postgres"
   },
   "test": {
