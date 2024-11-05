@@ -1,5 +1,4 @@
 const { Category, Product } = require('../models');
-const uuid = require('uuid');
 
 /**
  * Creates a new category
@@ -9,10 +8,7 @@ const uuid = require('uuid');
  */
 const createCategory = async (req, res) => {
   try {
-    if (req.body.name.length < 3) {
-      return res.status(400).json({ error: 'A categoria deve ter mais de 3 caracteres' });
-    }
-    const category = await Category.create({ ...req.body, id: uuid.v4() });
+    const category = await Category.create(req.body);
     return res.status(201).json(
       category,
     );
