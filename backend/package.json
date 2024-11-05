@@ -19,7 +19,8 @@
     "helmet": "^8.0.0",
     "morgan": "^1.10.0",
     "pg": "^8.13.0",
-    "sequelize": "^6.37.4"
+    "sequelize": "^6.37.4",
+    "uuid": "^11.0.2"
   },
   "devDependencies": {
     "dotenv": "^16.4.5",

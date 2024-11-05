@@ -1,3 +1,4 @@
+const uuid = require('uuid');
 const { Category, Product } = require('../models');
 
 /**
@@ -8,7 +9,7 @@ const { Category, Product } = require('../models');
  */
 const createCategory = async (req, res) => {
   try {
-    const category = await Category.create(req.body);
+    const category = await Category.create({...req.body, id: uuid.v4() });
     return res.status(201).json(
       category,
     );
