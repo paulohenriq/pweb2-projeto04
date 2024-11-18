@@ -1,4 +1,6 @@
 const { Product } = require('../models')
+const upload = require('../middlewares/upload');
+const { v4: uuidv4 } = require('uuid');
 const { body, validationResult } = require('express-validator');
 
 /**
@@ -8,6 +10,7 @@ const { body, validationResult } = require('express-validator');
  * @returns Object
  */
 const createProduct = [
+  upload.single('productImage'),
   body('name').notEmpty().withMessage('Nome é obrigatório'),
   body('price').isNumeric().withMessage('O preço deve ser numérico'),
 
@@ -17,10 +20,15 @@ const createProduct = [
       return res.status(400).json({ errors: errors.array() });
     }
 
+    console.log('O que vem no req.file', req.file)
+
     // Transformação dos dados
     const transformedData = {
       ...req.body,
-      name: req.body.name.toLowerCase()
+      id: uuidv4(),
+      name: req.body.name.toLowerCase(),
+      productImage: req.file ? req.file.filename : null,
+      expiryDate: new Date()
     };
 
     try {
