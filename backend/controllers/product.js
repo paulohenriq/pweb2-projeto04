@@ -1,5 +1,7 @@
-const { Product } = require('../models')
-const upload = require('../middlewares/upload');
+const { Product } = require('../models');
+const multer = require('multer');
+const uploadToCloudinary = require('../middlewares/upload-cloud');
+const upload = multer({ storage: multer.memoryStorage() });
 const { v4: uuidv4 } = require('uuid');
 const { body, validationResult } = require('express-validator');
 
@@ -10,7 +12,11 @@ const { body, validationResult } = require('express-validator');
  * @returns Object
  */
 const createProduct = [
+  // Upload de arquivo em disco
   upload.single('productImage'),
+
+  // Upload de arquivo em nuvem
+  uploadToCloudinary,
   body('name').notEmpty().withMessage('Nome é obrigatório'),
   body('price').isNumeric().withMessage('O preço deve ser numérico'),
 
@@ -20,14 +26,13 @@ const createProduct = [
       return res.status(400).json({ errors: errors.array() });
     }
 
-    console.log('O que vem no req.file', req.file)
-
     // Transformação dos dados
     const transformedData = {
       ...req.body,
       id: uuidv4(),
       name: req.body.name.toLowerCase(),
-      productImage: req.file ? req.file.filename : null,
+      // productImage: req.file ? req.file.filename : null, // Upload de arquivo em disco
+      productImage: req.cloudinaryUrl || null, // Upload de arquivo em nuvem
       expiryDate: new Date()
     };
 
