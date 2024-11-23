@@ -1,4 +1,8 @@
-const { Product } = require('../models')
+const { Product } = require('../models');
+const multer = require('multer');
+const uploadToCloudinary = require('../middlewares/upload-cloud');
+const upload = multer({ storage: multer.memoryStorage() });
+const { v4: uuidv4 } = require('uuid');
 const { body, validationResult } = require('express-validator');
 
 /**
@@ -7,17 +11,41 @@ const { body, validationResult } = require('express-validator');
  * @param {*} res
  * @returns Object
  */
-const createProduct = async (req, res) => {
-  try {
-    const product = await Product.create(req.body)
+const createProduct = [
+  // Upload de arquivo em disco
+  upload.single('productImage'),
 
-    return res.status(201).json(
-      product
-    )
-  } catch (error) {
-    return res.status(500).json({ error: error.message })
+  // Upload de arquivo em nuvem
+  uploadToCloudinary,
+  body('name').notEmpty().withMessage('Nome é obrigatório'),
+  body('price').isNumeric().withMessage('O preço deve ser numérico'),
+
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    // Transformação dos dados
+    const transformedData = {
+      ...req.body,
+      id: uuidv4(),
+      name: req.body.name.toLowerCase(),
+      // productImage: req.file ? req.file.filename : null, // Upload de arquivo em disco
+      productImage: req.cloudinaryUrl || null, // Upload de arquivo em nuvem
+      expiryDate: new Date()
+    };
+
+    try {
+      const product = await Product.create(transformedData);
+      return res.status(201).json(
+        product
+      );
+    } catch (error) {
+      return res.status(500).json({ error: error.message });
+    }
   }
-}
+];
 
 
 /**
@@ -64,22 +92,37 @@ const getProductById = async (req, res) => {
  * @param {*} res
  * @returns boolean
  */
-const updateProductById = async (req, res) => {
-  try {
-    const { id } = req.params
-    const product = await Product.update(req.body, {
-      where: { id: id }
-    })
+const updateProductById = [
+  body('name').optional().notEmpty().withMessage('Nome não pode estar vazio'),
+  body('price').optional().isNumeric().withMessage('O preço deve ser numérico'),
 
-    if (product) {
-      const updatedProduct = await Product.findOne({ where: { id: id } })
-      return res.status(200).json(updatedProduct)
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
     }
-    throw new Error('product not found')
-  } catch (error) {
-    return res.status(500).send(error.message)
+
+    try {
+      const { id } = req.params;
+      let product = await Product.findOne({ where: { id: id } });
+
+      if (!product) {
+        return res.status(404).send('Product not found');
+      }
+
+      // Transformação de dados antes de atualizar
+      const updatedData = req.body;
+      if (updatedData.name) {
+        updatedData.name = updatedData.name.toLowerCase(); // Converter nome para minúsculo
+      }
+
+      await product.update(updatedData);
+      return res.status(200).json( product );
+    } catch (error) {
+      return res.status(500).send(error.message);
+    }
   }
-}
+];
 
 
 /**

@@ -15,11 +15,11 @@ const routes = require('./routes')
 const app = express()
 
 // Port if PORT env variable does not exist in .env
-const port = 3000
+const port = process.env.PORT || 3335
 
 // CORS
 const corsOptions = {
-  origin: `http://localhost:3336`,
+  origin: `${process.env.FRONTEND_URL}`,
   methods: ['GET', 'POST', 'PUT', 'DELETE'], // Métodos permitidos
   allowedHeaders: ['Content-Type', 'Authorization'],
 }
@@ -35,6 +35,6 @@ app.use(helmet())
 app.use('/api', routes)
 
 // Port listener
-app.listen(process.env.PORT || port, () => {
-  console.log(`Server is running on ${process.env.PORT || port}`)
+app.listen(port, () => {
+  console.log(`Server is running on ${port}`)
 })
