@@ -1,5 +1,6 @@
-const uuid = require('uuid');
 const { Category, Product } = require('../models');
+const { v4: uuidv4 } = require('uuid');
+const transporter = require('../config/nodemailer');
 
 /**
  * Creates a new category
@@ -9,7 +10,20 @@ const { Category, Product } = require('../models');
  */
 const createCategory = async (req, res) => {
   try {
-    const category = await Category.create({...req.body, id: uuid.v4() });
+    const category = await Category.create({...req.body, id: uuidv4()});
+
+    // Enviar email de notificação para o administrador
+    const mailOptions = {
+      from: 'jacksondgls@live.com',
+      to: 'jacksondgls@gmail.com',
+      subject: 'Nova categoria criada',
+      text: `Uma nova categoria foi criada no dia ${category.createdAt}: ${category.name}`,
+      html: `<p>Uma nova categoria foi criada no dia ${category.createdAt}: ${category.name}</p>`,
+    };
+
+    // Enviar email
+    await transporter.sendMail(mailOptions);
+
     return res.status(201).json(
       category,
     );
