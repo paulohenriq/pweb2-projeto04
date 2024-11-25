@@ -102,8 +102,8 @@ const updateCategory = async (req, res) => {
         from: 'jacksondgls@live.com',
         to: 'jacksondgls@gmail.com',
         subject: 'Atualizado categoria',
-        text: `Uma categoria foi atualizada no dia ${new Date()}: ${category.name}`,
-        html: `<p>Uma categoria foi atualizada no dia ${new Date()}: ${category.name}</p>`,
+        text: `Uma categoria foi atualizada no dia ${new Date()}: ${updatedCategory.name}`,
+        html: `<p>Uma categoria foi atualizada no dia ${new Date()}: ${updatedCategory.name}</p>`,
       };
 
       // Enviar email
