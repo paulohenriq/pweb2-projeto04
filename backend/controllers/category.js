@@ -1,6 +1,8 @@
 const { Category, Product } = require('../models');
 const { v4: uuidv4 } = require('uuid');
 const transporter = require('../config/nodemailer');
+const authMiddleware = require('../middlewares/auth');
+
 
 /**
  * Creates a new category
@@ -132,7 +134,7 @@ const deleteCategory = async (req, res) => {
 
 module.exports = {
   createCategory,
-  getAllCategories,
+  getAllCategories: [authMiddleware, getAllCategories],
   getCategoryById,
   updateCategory,
   deleteCategory,
