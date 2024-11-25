@@ -93,6 +93,12 @@ const getProductById = async (req, res) => {
  * @returns boolean
  */
 const updateProductById = [
+  // Upload de arquivo em disco
+  upload.single('productImage'),
+
+  // Upload de arquivo em nuvem
+  uploadToCloudinary,
+
   body('name').optional().notEmpty().withMessage('Nome não pode estar vazio'),
   body('price').optional().isNumeric().withMessage('O preço deve ser numérico'),
 
@@ -114,6 +120,11 @@ const updateProductById = [
       const updatedData = req.body;
       if (updatedData.name) {
         updatedData.name = updatedData.name.toLowerCase(); // Converter nome para minúsculo
+
+        // updatedData.productImage = req.file.filename || null; // Upload de arquivo em disco
+        updatedData.productImage = req.cloudinaryUrl || null; // Upload de arquivo em nuvem
+
+        updatedData.updatedAt = new Date();
       }
 
       await product.update(updatedData);
