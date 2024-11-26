@@ -18,7 +18,7 @@ router.put('/v1/products/:id', productController.updateProductById);
 router.delete('/v1/products/:id', productController.deleteProductById);
 
 // Auth routes
-router.post('/v1/auth/signup', authController.signup);
 router.post('/v1/auth/login', authController.login);
+router.post('/v1/auth/signup', authController.signup);
 
 module.exports = router;

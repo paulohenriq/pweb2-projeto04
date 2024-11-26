@@ -68,10 +68,10 @@ const login = [
 
       const token = jwt.sign(
         { 
-          id: user.id 
+          id: user.id
         }, 
         process.env.JWT_SECRET, 
-        { expiresIn: process.env.JWT_EXPIRES_IN }
+        { expiresIn: process.env.JWT_EXPIRES_IN } // TTL do token
       );
 
       return res.status(200).json({ token });

@@ -4,7 +4,7 @@ const authMiddleware = (req, res, next) => {
   const token = req.headers['authorization'];
 
   if (!token) {
-    return res.status(401).send('Access Denied');
+    return res.status(401).send('É necessário estar autenticado para acessar esta rota');
   }
 
   const cleanToken = token.replace('Bearer ', '');
