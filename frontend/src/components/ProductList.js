@@ -2,14 +2,21 @@ import React, { useState, useEffect } from 'react'
 import { Table, Button, Image } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 import axios from 'axios'
+import { useNavigate } from 'react-router-dom';
 
 export default function ProductList() {
   const [products, setProducts] = useState([])
   const [error, setError] = useState(null)
+  const navigate = useNavigate();
 
   useEffect(() => {
-    fetchProducts()
-  }, [])
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/login', { state: { error: 'Você precisa estar autenticado para acessar esta página.' } });
+    } else {
+      fetchProducts()
+    }
+  }, []);
 
   const fetchProducts = async () => {
     try {

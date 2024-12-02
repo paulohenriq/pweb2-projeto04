@@ -9,8 +9,13 @@ export default function CategoryForm() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    if (id) {
-      fetchCategory()
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/login', { state: { error: 'Você precisa estar autenticado para acessar esta página.' } });
+    } else {
+      if (id) {
+        fetchCategory()
+      }
     }
   }, [id])
 
