@@ -16,11 +16,11 @@ const createCategory = async (req, res) => {
 
     // Enviar email de notificação para o administrador
     const mailOptions = {
-      from: 'paulo.gomes@uncisal.edu.br',
-      to: 'paulohenriquegomessilva1@gmail.com',
+      from: 'jacksondgls@live.com',
+      to: 'jacksondgls@gmail.com',
       subject: 'Nova categoria criada',
-      text: `Uma nova categoria foi criada na aula do dia 18/11/2024: ${category.name}`,
-      html: `<p>Uma nova categoria foi criada na aula do dia 18/11/2024: ${category.name}</p>`,
+      text: `Uma nova categoria foi criada no dia ${category.createdAt}: ${category.name}`,
+      html: `<p>Uma nova categoria foi criada no dia ${category.createdAt}: ${category.name}</p>`,
     };
 
     // Enviar email
@@ -98,6 +98,19 @@ const updateCategory = async (req, res) => {
           },
         ],
       });
+
+      // Enviar email de notificação para o administrador
+      const mailOptions = {
+        from: 'jacksondgls@live.com',
+        to: 'jacksondgls@gmail.com',
+        subject: 'Atualizado categoria',
+        text: `Uma categoria foi atualizada no dia ${new Date()}: ${updatedCategory.name}`,
+        html: `<p>Uma categoria foi atualizada no dia ${new Date()}: ${updatedCategory.name}</p>`,
+      };
+
+      // Enviar email
+      await transporter.sendMail(mailOptions);
+
       return res.status(200).json(updatedCategory);
     }
 
