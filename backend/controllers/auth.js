@@ -74,6 +74,14 @@ const login = [
         { expiresIn: process.env.JWT_EXPIRES_IN } // TTL do token
       );
 
+      // Configuração do cookie
+      res.cookie('auth_token', token, {
+        httpOnly: true, // Impede acesso no client-side
+        secure: process.env.NODE_ENV === 'production', // Cookies seguros apenas em HTTPS
+        sameSite: 'strict', // Proteção contra CSRF
+        maxAge: 24 * 60 * 60 * 1000, // 1 dia em milissegundos
+      });
+
       return res.status(200).json({ token });
     } catch (error) {
       return res.status(500).json({ error: error.message });
