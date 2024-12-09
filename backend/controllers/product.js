@@ -4,6 +4,7 @@ const uploadToCloudinary = require('../middlewares/upload-cloud');
 const upload = multer({ storage: multer.memoryStorage() });
 const { v4: uuidv4 } = require('uuid');
 const { body, validationResult } = require('express-validator');
+const redis = require('../config/redisClient');
 
 /**
  * Creates a new product
@@ -56,7 +57,19 @@ const createProduct = [
  */
 const getAllProducts = async (req, res) => {
   try {
+    const cacheKey = 'products:list';
+    const cacheData = await redis.get(cacheKey);
+
+    if (cacheData) {
+      console.log('Dados do cache de produto obtidos');
+      return res.status(200).json(JSON.parse(cacheData));
+    }
+
     const products = await Product.findAll({ order: [['createdAt', 'DESC']] })
+
+    // Salva em cache por 1 hora
+    await redis.set(cacheKey, JSON.stringify(products), 'EX', 3600);
+    console.log('Dados do produtos armazenados em cache');
 
     return res.status(200).json( products )
   } catch (error) {
