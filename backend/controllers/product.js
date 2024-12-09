@@ -5,6 +5,7 @@ const upload = multer({ storage: multer.memoryStorage() });
 const { v4: uuidv4 } = require('uuid');
 const { body, validationResult } = require('express-validator');
 const redis = require('../config/redisClient');
+const productQueue = require('../queue/product');
 
 /**
  * Creates a new product
@@ -38,14 +39,9 @@ const createProduct = [
     };
 
     try {
-      const product = await Product.create(transformedData);
+      const job = await productQueue.add({ operation: 'create', data: transformedData });
 
-      await redis.del('products:list');
-      console.log("invalidado cache de produtos");
-
-      return res.status(201).json(
-        product
-      );
+      return res.status(201).json({ message: 'Produto em processamento', jobId: job.id });
     } catch (error) {
       return res.status(500).json({ error: error.message });
     }
@@ -125,31 +121,18 @@ const updateProductById = [
       return res.status(400).json({ errors: errors.array() });
     }
 
+    const { id } = req.params;
+    const updatedData = {
+      ...req.body,
+      name: req.body.name ? req.body.name.toLowerCase() : undefined,
+      productImage: req.cloudinaryUrl || null,
+      updatedAt: new Date(),
+    };
+
     try {
-      const { id } = req.params;
-      let product = await Product.findOne({ where: { id: id } });
+      const job = await productQueue.add({ operation: 'update', data: { id, updatedData } });
 
-      if (!product) {
-        return res.status(404).send('Product not found');
-      }
-
-      // Transformação de dados antes de atualizar
-      const updatedData = req.body;
-      if (updatedData.name) {
-        updatedData.name = updatedData.name.toLowerCase(); // Converter nome para minúsculo
-
-        // updatedData.productImage = req.file.filename || null; // Upload de arquivo em disco
-        updatedData.productImage = req.cloudinaryUrl || null; // Upload de arquivo em nuvem
-
-        updatedData.updatedAt = new Date();
-      }
-
-      await product.update(updatedData);
-
-      await redis.del('products:list');
-      console.log("invalidado cache de produtos");
-
-      return res.status(200).json( product );
+      return res.status(202).json({ message: 'Atualização de produto em processamento', jobId: job.id });
     } catch (error) {
       return res.status(500).send(error.message);
     }

@@ -1,8 +1,8 @@
-const { Category, Product } = require('../models');
+const { Category } = require('../models');
 const { v4: uuidv4 } = require('uuid');
-const transporter = require('../config/nodemailer');
 const authMiddleware = require('../middlewares/auth');
 const redis = require('../config/redisClient');
+const categoryQueue = require('../queue/category');
 
 /**
  * Creates a new category
@@ -11,27 +11,16 @@ const redis = require('../config/redisClient');
  * @returns Object
  */
 const createCategory = async (req, res) => {
+  // Transformação dos dados
+  const transformedData = {
+    ...req.body,
+    id: uuidv4(),
+  };
+
   try {
-    const category = await Category.create({...req.body, id: uuidv4()});
+    const job = await categoryQueue.add({ operation: 'create', data: transformedData });
 
-    await redis.del('categories:list');
-    console.log("invalidado cache de categorias");
-
-    // Enviar email de notificação para o administrador
-    const mailOptions = {
-      from: 'paulo.gomes@uncisal.edu.br',
-      to: 'paulohenriquegomessilva1@gmail.com',
-      subject: 'Nova categoria criada',
-      text: `Uma nova categoria foi criada na aula do dia 18/11/2024: ${category.name}`,
-      html: `<p>Uma nova categoria foi criada na aula do dia 18/11/2024: ${category.name}</p>`,
-    };
-
-    // Enviar email
-    await transporter.sendMail(mailOptions);
-
-    return res.status(201).json(
-      category,
-    );
+    return res.status(201).json({ message: 'Categoria em processamento', jobId: job.id });
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
@@ -101,27 +90,15 @@ const getCategoryById = async (req, res) => {
  * @returns boolean
  */
 const updateCategory = async (req, res) => {
+  const { id } = req.params;
+  const updatedData = {
+    ...req.body,
+  };
+
   try {
-    const { id } = req.params;
-    const [updated] = await Category.update(req.body, { where: { id: id } });
+    const job = await categoryQueue.add({ operation: 'update', data: { id, updatedData } });
 
-    if (updated) {
-      const updatedCategory = await Category.findOne({
-        where: { id: id },
-        include: [
-          {
-            model: Product,
-          },
-        ],
-      });
-
-      await redis.del('categories:list');
-      console.log("invalidado cache de categorias");
-
-      return res.status(200).json(updatedCategory);
-    }
-
-    throw new Error('Category not found ');
+    return res.status(201).json({ message: 'Atualização de categoria em processamento', jobId: job.id });
   } catch (error) {
     return res.status(500).send(error.message);
   }
