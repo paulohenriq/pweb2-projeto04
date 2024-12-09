@@ -1,7 +1,7 @@
 const router = require('express').Router();
 
 // Controller imports
-const { categoryController, productController } = require('../controllers');
+const { categoryController, productController, authController } = require('../controllers');
 
 // Category routes
 router.get('/v1/categories', categoryController.getAllCategories);
@@ -16,5 +16,9 @@ router.post('/v1/products', productController.createProduct);
 router.get('/v1/products/:id', productController.getProductById);
 router.put('/v1/products/:id', productController.updateProductById);
 router.delete('/v1/products/:id', productController.deleteProductById);
+
+// Auth routes
+router.post('/v1/auth/login', authController.login);
+router.post('/v1/auth/signup', authController.signup);
 
 module.exports = router;

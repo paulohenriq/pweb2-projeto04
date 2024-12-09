@@ -2,17 +2,29 @@ import React, { useState, useEffect } from 'react'
 import { Table, Button } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 import axios from 'axios'
+import { useNavigate } from 'react-router-dom';
 
 export default function CategoryList() {
   const [categories, setCategories] = useState([])
+  const navigate = useNavigate();
 
   useEffect(() => {
-    fetchCategories()
-  }, [])
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/login', { state: { error: 'Você precisa estar autenticado para acessar esta página.' } });
+    } else {
+      fetchCategories();
+    }
+  }, []);
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get('http://localhost:3335/api/v1/categories')
+      const token = localStorage.getItem('token');
+      const response = await axios.get('http://localhost:3335/api/v1/categories', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
       setCategories(response.data)
     } catch (error) {
       console.error('Error fetching categories:', error)
