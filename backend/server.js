@@ -3,6 +3,8 @@ if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config()
 }
 
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./config/swaggerConfig');
 const express = require('express')
 const cors = require('cors')
 const logger = require('morgan')
@@ -35,6 +37,7 @@ app.use(cookieParser());
 
 // Routes middleware
 app.use('/api', routes)
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec))
 
 // Port listener
 app.listen(port, () => {
