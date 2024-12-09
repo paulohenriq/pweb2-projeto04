@@ -33,3 +33,5 @@ productQueue.process(async (job) => {
       throw new Error('Operação inválida');
   }
 });
+
+module.exports = productQueue;
