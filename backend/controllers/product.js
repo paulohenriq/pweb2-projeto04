@@ -69,7 +69,7 @@ const getAllProducts = async (req, res) => {
 
     // Salva em cache por 1 hora
     await redis.set(cacheKey, JSON.stringify(products), 'EX', 3600);
-    console.log('Dados do produtos armazenados em cache');
+    console.log('Dados dos produtos armazenados em cache');
 
     return res.status(200).json( products )
   } catch (error) {
