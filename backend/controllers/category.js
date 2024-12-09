@@ -47,7 +47,6 @@ const getAllCategories = async (req, res) => {
   try {
     const cacheKey = 'categories:list';
     const cacheData = await redis.get(cacheKey);
-    console.log("invalidado cache de categorias");
 
     if (cacheData) {
       console.log('Dados do cache de categoria obtidos');
@@ -146,7 +145,7 @@ const deleteCategory = async (req, res) => {
     if (deleted) {
       await redis.del('categories:list');
       console.log("invalidado cache de categorias");
-      
+
       return res.status(204).send('Category deleted');
     }
 
