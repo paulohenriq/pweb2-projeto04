@@ -2,7 +2,7 @@ const { Category, Product } = require('../models');
 const { v4: uuidv4 } = require('uuid');
 const transporter = require('../config/nodemailer');
 const authMiddleware = require('../middlewares/auth');
-
+const redis = require('../config/redisClient');
 
 /**
  * Creates a new category
@@ -13,6 +13,9 @@ const authMiddleware = require('../middlewares/auth');
 const createCategory = async (req, res) => {
   try {
     const category = await Category.create({...req.body, id: uuidv4()});
+
+    await redis.del('categories:list');
+    console.log("invalidado cache de categorias");
 
     // Enviar email de notificação para o administrador
     const mailOptions = {
@@ -42,9 +45,22 @@ const createCategory = async (req, res) => {
  */
 const getAllCategories = async (req, res) => {
   try {
+    const cacheKey = 'categories:list';
+    const cacheData = await redis.get(cacheKey);
+
+    if (cacheData) {
+      console.log('Dados do cache de categoria obtidos');
+      return res.status(200).json(JSON.parse(cacheData));
+    }
+
     const categories = await Category.findAll({
       order: [['createdAt', 'DESC']],
     });
+
+    // Salva em cache por 1 hora
+    await redis.set(cacheKey, JSON.stringify(categories), 'EX', 3600);
+    console.log('Dados das categorias armazenados em cache');
+
     return res.status(200).json(categories);
   } catch (error) {
     return res.status(500).send(error.message);
@@ -98,6 +114,10 @@ const updateCategory = async (req, res) => {
           },
         ],
       });
+
+      await redis.del('categories:list');
+      console.log("invalidado cache de categorias");
+
       return res.status(200).json(updatedCategory);
     }
 
@@ -123,6 +143,9 @@ const deleteCategory = async (req, res) => {
     });
 
     if (deleted) {
+      await redis.del('categories:list');
+      console.log("invalidado cache de categorias");
+
       return res.status(204).send('Category deleted');
     }
 
