@@ -39,6 +39,10 @@ const createProduct = [
 
     try {
       const product = await Product.create(transformedData);
+
+      await redis.del('products:list');
+      console.log("invalidado cache de produtos");
+
       return res.status(201).json(
         product
       );
@@ -141,13 +145,16 @@ const updateProductById = [
       }
 
       await product.update(updatedData);
+
+      await redis.del('products:list');
+      console.log("invalidado cache de produtos");
+
       return res.status(200).json( product );
     } catch (error) {
       return res.status(500).send(error.message);
     }
   }
 ];
-
 
 /**
  * Deletes a single product by it's id
@@ -164,6 +171,9 @@ const deleteProductById = async (req, res) => {
     })
 
     if (deletedProduct) {
+      await redis.del('products:list');
+      console.log("invalidado cache de produtos");
+      
       return res.status(204).send('Product deleted successfully ')
     }
 
