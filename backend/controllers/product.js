@@ -132,7 +132,7 @@ const updateProductById = [
     try {
       const job = await productQueue.add({ operation: 'update', data: { id, updatedData } });
 
-      return res.status(202).json({ message: 'Atualização em processamento', jobId: job.id });
+      return res.status(202).json({ message: 'Atualização de produto em processamento', jobId: job.id });
     } catch (error) {
       return res.status(500).send(error.message);
     }

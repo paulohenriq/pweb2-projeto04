@@ -14,7 +14,9 @@ productQueue.process(async (job) => {
   switch (operation) {
     case 'create': {
       const product = await Product.create(data);
+
       await redis.del('products:list');
+
       console.log("Produto criado e cache invalidado");
       return product;
     }
@@ -22,7 +24,7 @@ productQueue.process(async (job) => {
       const { id, updatedData } = data;
       let product = await Product.findOne({ where: { id } });
       if (!product) {
-        throw new Error('Product not found');
+        throw new Error('Produto não encontrado');
       }
       await product.update(updatedData);
       await redis.del('products:list');
