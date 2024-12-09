@@ -5,10 +5,26 @@ const redis = require('../config/redisClient');
 const categoryQueue = require('../queue/category');
 
 /**
- * Creates a new category
- * @param {*} req
- * @param {*} res
- * @returns Object
+ * @swagger
+ * /categories:
+ *   post:
+ *     summary: Cria uma nova categoria
+ *     tags: [Categories]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 description: Nome da categoria
+ *     responses:
+ *       201:
+ *         description: Categoria criada com sucesso
+ *       500:
+ *         description: Erro no servidor
  */
 const createCategory = async (req, res) => {
   // Transformação dos dados
@@ -27,10 +43,37 @@ const createCategory = async (req, res) => {
 };
 
 /**
- * Fetches all categories
- * @param {*} req
- * @param {*} res
- * @returns Object
+ * @swagger
+ * /categories:
+ *   get:
+ *     summary: Retorna todas as categorias
+ *     tags: [Categories]
+ *     responses:
+ *       200:
+ *         description: Lista de categorias retornada com sucesso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                     description: ID da categoria
+ *                   name:
+ *                     type: string
+ *                     description: Nome da categoria
+ *                   createdAt:
+ *                     type: string
+ *                     format: date-time
+ *                     description: Data de criação
+ *                   updatedAt:
+ *                     type: string
+ *                     format: date-time
+ *                     description: Data da última atualização
+ *       500:
+ *         description: Erro no servidor
  */
 const getAllCategories = async (req, res) => {
   try {
@@ -57,10 +100,44 @@ const getAllCategories = async (req, res) => {
 };
 
 /**
- * Gets a single category by it's id
- * @param {*} req
- * @param {*} res
- * @returns boolean
+ * @swagger
+ * /categories/{id}:
+ *   get:
+ *     summary: Retorna uma categoria pelo ID
+ *     tags: [Categories]
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: ID da categoria
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Categoria encontrada com sucesso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                   description: ID da categoria
+ *                 name:
+ *                   type: string
+ *                   description: Nome da categoria
+ *                 createdAt:
+ *                   type: string
+ *                   format: date-time
+ *                   description: Data de criação
+ *                 updatedAt:
+ *                   type: string
+ *                   format: date-time
+ *                   description: Data da última atualização
+ *       404:
+ *         description: Categoria não encontrada
+ *       500:
+ *         description: Erro no servidor
  */
 const getCategoryById = async (req, res) => {
   try {
@@ -84,10 +161,37 @@ const getCategoryById = async (req, res) => {
 };
 
 /**
- * Updates a single category by it's id
- * @param {*} req
- * @param {*} res
- * @returns boolean
+ * @swagger
+ * /categories/{id}:
+ *   put:
+ *     summary: Atualiza uma categoria pelo ID
+ *     tags: [Categories]
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: ID da categoria a ser atualizada
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 description: Nome da categoria
+ *     responses:
+ *       200:
+ *         description: Categoria atualizada com sucesso
+ *       400:
+ *         description: Dados inválidos fornecidos para a atualização
+ *       404:
+ *         description: Categoria não encontrada
+ *       500:
+ *         description: Erro no servidor
  */
 const updateCategory = async (req, res) => {
   const { id } = req.params;
@@ -105,10 +209,25 @@ const updateCategory = async (req, res) => {
 };
 
 /**
- * Deletes a single category by it's id
- * @param {*} req
- * @param {*} res
- * @returns Boolean
+ * @swagger
+ * /categories/{id}:
+ *   delete:
+ *     summary: Deleta uma categoria pelo ID
+ *     tags: [Categories]
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: ID da categoria a ser deletada
+ *         schema:
+ *           type: string
+ *     responses:
+ *       204:
+ *         description: Categoria deletada com sucesso
+ *       404:
+ *         description: Categoria não encontrada
+ *       500:
+ *         description: Erro no servidor
  */
 const deleteCategory = async (req, res) => {
   try {

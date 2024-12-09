@@ -8,10 +8,35 @@ const redis = require('../config/redisClient');
 const productQueue = require('../queue/product');
 
 /**
- * Creates a new product
- * @param {*} req
- * @param {*} res
- * @returns Object
+ * @swagger
+ * /products:
+ *   post:
+ *     summary: Cria um novo produto
+ *     tags: [Products]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 description: Nome do produto
+ *               price:
+ *                 type: number
+ *                 description: Preço do produto
+ *               productImage:
+ *                 type: string
+ *                 format: binary
+ *                 description: Imagem do produto (upload)
+ *     responses:
+ *       201:
+ *         description: Produto em processamento
+ *       400:
+ *         description: Erro de validação de dados
+ *       500:
+ *         description: Erro no servidor
  */
 const createProduct = [
   // Upload de arquivo em disco
@@ -48,12 +73,17 @@ const createProduct = [
   }
 ];
 
-
 /**
- * Fetches all products
- * @param {*} req
- * @param {*} res
- * @returns Object
+ * @swagger
+ * /products:
+ *   get:
+ *     summary: Obtém todos os produtos
+ *     tags: [Products]
+ *     responses:
+ *       200:
+ *         description: Lista de produtos
+ *       500:
+ *         description: Erro no servidor
  */
 const getAllProducts = async (req, res) => {
   try {
@@ -78,10 +108,25 @@ const getAllProducts = async (req, res) => {
 }
 
 /**
- * Gets a single product by it's id
- * @param {*} req
- * @param {*} res
- * @returns boolean
+ * @swagger
+ * /products/{id}:
+ *   get:
+ *     summary: Obtém um produto por ID
+ *     tags: [Products]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID do produto
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Produto encontrado
+ *       404:
+ *         description: Produto não encontrado
+ *       500:
+ *         description: Erro no servidor
  */
 const getProductById = async (req, res) => {
   try {
@@ -99,11 +144,43 @@ const getProductById = async (req, res) => {
     return res.status(500).send(error.message)
   }
 }
+
 /**
- * Updates a single product by it's id
- * @param {*} req
- * @param {*} res
- * @returns boolean
+ * @swagger
+ * /products/{id}:
+ *   put:
+ *     summary: Atualiza um produto existente
+ *     tags: [Products]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID do produto
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 description: Nome do produto
+ *               price:
+ *                 type: number
+ *                 description: Preço do produto
+ *               productImage:
+ *                 type: string
+ *                 description: URL da imagem do produto
+ *     responses:
+ *       202:
+ *         description: Produto em atualização
+ *       400:
+ *         description: Erro de validação de dados
+ *       500:
+ *         description: Erro no servidor
  */
 const updateProductById = [
   // Upload de arquivo em disco
@@ -140,10 +217,25 @@ const updateProductById = [
 ];
 
 /**
- * Deletes a single product by it's id
- * @param {*} req
- * @param {*} res
- * @returns boolean
+ * @swagger
+ * /products/{id}:
+ *   delete:
+ *     summary: Deleta um produto por ID
+ *     tags: [Products]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID do produto
+ *         schema:
+ *           type: string
+ *     responses:
+ *       204:
+ *         description: Produto deletado com sucesso
+ *       404:
+ *         description: Produto não encontrado
+ *       500:
+ *         description: Erro no servidor
  */
 const deleteProductById = async (req, res) => {
   try {
