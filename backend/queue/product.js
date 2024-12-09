@@ -1,10 +1,10 @@
 const Queue = require('bull');
 const { Product } = require('../models');
-const redisConfig = require('../config/redisClient');
+const redis = require('../config/redisClient');
 
 // Criar uma fila chamada "productQueue"
 const productQueue = new Queue('productQueue', {
-  redis: redisConfig.options,
+  redis: redis.options,
 });
 
 // Processador da fila
@@ -32,6 +32,35 @@ productQueue.process(async (job) => {
     default:
       throw new Error('Operação inválida');
   }
+});
+
+// Monitorar eventos de fila
+productQueue.on('completed', (job, result) => {
+  console.log(`O job ${job.id} foi concluído com o resultado: ${result}`);
+});
+
+productQueue.on('failed', (job, error) => {
+  console.log(`O job ${job.id} falhou com o erro: ${error}`);
+});
+
+productQueue.on('stalled', (job) => {
+  console.log(`O job ${job.id} foi parado`);
+});
+
+productQueue.on('active', (job) => {
+  console.log(`O job ${job.id} está agora ativo`);
+});
+
+productQueue.on('waiting', (jobId) => {
+  console.log(`O job ${jobId} está aguardando`);
+});
+
+productQueue.on('delayed', (jobId, delay) => {
+  console.log(`O job ${jobId} está atrasado por ${delay} ms`);
+});
+
+productQueue.on('removed', (job) => {
+  console.log(`O job ${job.id} foi removido`);
 });
 
 module.exports = productQueue;
