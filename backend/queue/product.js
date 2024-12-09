@@ -38,31 +38,31 @@ productQueue.process(async (job) => {
 
 // Monitorar eventos de fila
 productQueue.on('completed', (job, result) => {
-  console.log(`O job ${job.id} foi concluído com o resultado: ${result}`);
+  console.log(`O job do produto ${job.id} foi concluído com o resultado: ${result}`);
 });
 
 productQueue.on('failed', (job, error) => {
-  console.log(`O job ${job.id} falhou com o erro: ${error}`);
+  console.log(`O job do produto ${job.id} falhou com o erro: ${error}`);
 });
 
 productQueue.on('stalled', (job) => {
-  console.log(`O job ${job.id} foi parado`);
+  console.log(`O job do produto ${job.id} foi parado`);
 });
 
 productQueue.on('active', (job) => {
-  console.log(`O job ${job.id} está agora ativo`);
+  console.log(`O job do produto ${job.id} está agora ativo`);
 });
 
 productQueue.on('waiting', (jobId) => {
-  console.log(`O job ${jobId} está aguardando`);
+  console.log(`O job do produto ${jobId} está aguardando`);
 });
 
 productQueue.on('delayed', (jobId, delay) => {
-  console.log(`O job ${jobId} está atrasado por ${delay} ms`);
+  console.log(`O job do produto ${jobId} está atrasado por ${delay} ms`);
 });
 
 productQueue.on('removed', (job) => {
-  console.log(`O job ${job.id} foi removido`);
+  console.log(`O job do produto ${job.id} foi removido`);
 });
 
 module.exports = productQueue;

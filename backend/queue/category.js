@@ -57,31 +57,31 @@ categoryQueue.process(async (job) => {
 
 // Monitorar eventos de fila
 categoryQueue.on('completed', (job, result) => {
-  console.log(`O job ${job.id} foi concluído com o resultado: ${result}`);
+  console.log(`O job de categoria ${job.id} foi concluído com o resultado: ${result}`);
 });
 
 categoryQueue.on('failed', (job, error) => {
-  console.log(`O job ${job.id} falhou com o erro: ${error}`);
+  console.log(`O job de categoria ${job.id} falhou com o erro: ${error}`);
 });
 
 categoryQueue.on('stalled', (job) => {
-  console.log(`O job ${job.id} foi parado`);
+  console.log(`O job de categoria ${job.id} foi parado`);
 });
 
 categoryQueue.on('active', (job) => {
-  console.log(`O job ${job.id} está agora ativo`);
+  console.log(`O job de categoria ${job.id} está agora ativo`);
 });
 
 categoryQueue.on('waiting', (jobId) => {
-  console.log(`O job ${jobId} está aguardando`);
+  console.log(`O job de categoria ${jobId} está aguardando`);
 });
 
 categoryQueue.on('delayed', (jobId, delay) => {
-  console.log(`O job ${jobId} está atrasado por ${delay} ms`);
+  console.log(`O job de categoria ${jobId} está atrasado por ${delay} ms`);
 });
 
 categoryQueue.on('removed', (job) => {
-  console.log(`O job ${job.id} foi removido`);
+  console.log(`O job de categoria ${job.id} foi removido`);
 });
 
 module.exports = categoryQueue;
