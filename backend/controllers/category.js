@@ -14,6 +14,9 @@ const createCategory = async (req, res) => {
   try {
     const category = await Category.create({...req.body, id: uuidv4()});
 
+    await redis.del('categories:list');
+    console.log("invalidado cache de categorias");
+
     // Enviar email de notificação para o administrador
     const mailOptions = {
       from: 'paulo.gomes@uncisal.edu.br',
@@ -44,6 +47,7 @@ const getAllCategories = async (req, res) => {
   try {
     const cacheKey = 'categories:list';
     const cacheData = await redis.get(cacheKey);
+    console.log("invalidado cache de categorias");
 
     if (cacheData) {
       console.log('Dados do cache de categoria obtidos');
@@ -111,6 +115,10 @@ const updateCategory = async (req, res) => {
           },
         ],
       });
+
+      await redis.del('categories:list');
+      console.log("invalidado cache de categorias");
+
       return res.status(200).json(updatedCategory);
     }
 
@@ -136,6 +144,9 @@ const deleteCategory = async (req, res) => {
     });
 
     if (deleted) {
+      await redis.del('categories:list');
+      console.log("invalidado cache de categorias");
+      
       return res.status(204).send('Category deleted');
     }
 
